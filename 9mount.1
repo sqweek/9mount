@@ -1,0 +1,62 @@
+.TH "9mount" "1" "04 September 2007" "9mount" "User commands"
+.SH NAME
+9mount, 9umount \- mount/unmount 9p filesystems
+.SH SYNOPSIS
+.B 9mount
+[ -diuv ] [ -a SPEC ] DIAL MOUNTPT
+.PP
+.B 9umount
+MOUNTPT
+.SH DESCRIPTION
+.B 9mount
+mounts a 9p filesystem served at DIAL on MOUNTPT. MOUNTPT must be
+writable by you and not sticky. DIAL is dial string assuming one of the
+forms:
+.PP
+unix!SOCKET
+.br
+tcp!HOST[!PORT]
+.PP
+where SOCKET is the name of a file representing a socket, HOST is a
+hostname, and PORT is a port number or service name.
+.B 9mount
+has several options:
+.TP
+-d
+generate debugging output (can be specified multiple times)
+.TP
+-i
+mount the file system with your uid/gid
+.TP
+-u
+use the 9P2000.u extensions
+.TP
+-v
+use device mapping
+.TP
+-a SPEC
+SPEC determines which file tree to mount when attaching to file servers that
+export multiple trees
+.PP
+.B 9umount
+unmounts a 9p filesystem previously mounted by you.
+.SH EXAMPLES
+.TP
+9mount -i 'unix!/tmp/ns.'$USER'.:0/factotum' $HOME/n/factotum
+mount p9p's factotum interface
+.TP
+9mount 'tcp!sources.cs.bell-labs.com' $HOME/n/sources
+import plan 9's "sources"
+.TP
+9mount -u -a/home/sqweek/mail 'tcp!wren!5640' $HOME/mail
+import my maildir from my server(wren), being served by ufs
+.SH BUGS
+.B 9mount
+truncates user names and SPECs to 249 characters.
+.B 9umount
+doesn't know this, so you won't be able to unmount anything. But you
+probably never bother logging out if your user name is that long.
+.SH AUTHOR
+sqweek@gmail.com
+.SH SEE ALSO
+.BR mount (1)
