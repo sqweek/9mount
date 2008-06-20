@@ -84,7 +84,9 @@ main(int argc, char **argv)
 	/* FILE *fp;
 	struct mntent m; */
 
-	opts = calloc(optlen, 1);
+	if (!(opts=calloc(optlen, 1))) {
+		err(1, "calloc");
+	}
 	while (*++argv) {
 		char *cp;
 
