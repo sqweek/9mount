@@ -1,3 +1,8 @@
+2008-06-20 sqweek <sqweek@gmail.com>
+	* 1.2 release
+	* 9mount: support for linux kernels >= 2.6.24
+	* 9umount: allow unmounting of anything in your home dir
+
 2007-10-16 sqweek <sqweek@gmail.com>
 	* 1.1 release
 	* 9bind: new SUID utility for bind mounting
