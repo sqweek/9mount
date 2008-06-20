@@ -18,7 +18,7 @@ append(char **dest, char *src, int *destlen)
 {
 	while (strlen(*dest) + 1 + strlen(src) > *destlen)
 		*destlen *= 2;
-	if (!realloc(*dest, *destlen))
+	if (!(*dest=realloc(*dest, *destlen)))
 		errx(1, "Out of memory");
 
 	if (**dest)
@@ -47,7 +47,7 @@ parsedial(char *dial, char **network, char **netaddr, int *port)
 		errx(1, "empty dial string");
 	}
 	if (strcmp(*network, "unix") != 0 && strcmp(*network, "tcp") != 0) {
-		errx(1, "%s: unknown networkcol", *network);
+		errx(1, "%s: unknown network (expecting unix or tcp)", *network);
 	}
 	if (!(*netaddr=strtok(NULL, "!"))) {
 		errx(1, "missing dial netaddress");
@@ -131,7 +131,9 @@ main(int argc, char **argv)
 	parsedial(dial, &proto, &addr, &port);
 
 	/* set up mount options */
-	append(&opts, proto, &optlen);
+	append(&opts, proto, &optlen); /* < 2.6.24 */
+	snprintf(buf, sizeof(buf), "trans=%s", proto);
+	append(&opts, buf, &optlen); /* >= 2.6.24 */
 
 	pw = getpwuid(getuid());
 	snprintf(buf, sizeof(buf), "uname=%s", pw->pw_name);
@@ -145,7 +147,9 @@ main(int argc, char **argv)
 	}
 	if (uidgid) {
 		snprintf(buf, sizeof(buf), "uid=%d,gid=%d", getuid(), getgid());
-		append(&opts, buf, &optlen);
+		append(&opts, buf, &optlen); /* < 2.6.24 */
+		snprintf(buf, sizeof(buf), "dfltuid=%d,dfltgid=%d", getuid(), getgid());
+		append(&opts, buf, &optlen); /* >= 2.6.24 */
 	}
 	if (debug) {
 		snprintf(buf, sizeof(buf), "debug=%d", debug);
@@ -174,6 +178,7 @@ main(int argc, char **argv)
 		snprintf(buf, sizeof(buf), "%s", addr);
 	}
 
+	/* fprintf(stderr, "mount -t 9p -o %s %s %s\n", opts, buf, mountpt); */
 	if (mount(buf, mountpt, "9p", 0, (void*)opts)) {
 		err(1, "mount");
 	}
