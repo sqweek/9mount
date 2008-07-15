@@ -71,7 +71,6 @@ parsedial(char *dial, char **network, char **netaddr, int *port)
 	}
 }
 
-
 int
 main(int argc, char **argv)
 {
@@ -79,7 +78,7 @@ main(int argc, char **argv)
 	int optlen = 64, port = 0;
 	struct stat stbuf;
 	struct passwd *pw;
-	int dotu = 0, uidgid = 0, dev = 0, debug = 0;
+	int dotu = 0, uidgid = 0, dev = 0, debug = 0, dryrun = 0;
 	char *aname = NULL, *proto, *addr;
 	/* FILE *fp;
 	struct mntent m; */
@@ -93,13 +92,14 @@ main(int argc, char **argv)
 		if (**argv == '-') {
 			for (cp=*argv+1; *cp; ++cp) {
 				switch (*cp) {
+					case 'd': ++debug; break;
+					case 'i': uidgid = 1; break;
+					case 'n': dryrun = 1; break;
 					case 'u': dotu = 1; break;
 					case 'v': dev = 1; break;
-					case 'i': uidgid = 1; break;
-					case 'd': ++debug; break;
 					case 'a':
 						aname = getarg('a', cp, &argv);
-						*cp-- = '\0';
+						*cp-- = '\0'; /* breaks out of for loop */
 						break;
 				}
 			}
@@ -178,8 +178,9 @@ main(int argc, char **argv)
 		snprintf(buf, sizeof(buf), "%s", addr);
 	}
 
-	/* fprintf(stderr, "mount -t 9p -o %s %s %s\n", opts, buf, mountpt); */
-	if (mount(buf, mountpt, "9p", 0, (void*)opts)) {
+	if(dryrun) {
+		printf("mount -t 9p -o %s %s %s\n", opts, buf, mountpt);
+	} else if (mount(buf, mountpt, "9p", 0, (void*)opts)) {
 		err(1, "mount");
 	}
 
