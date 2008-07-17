@@ -3,7 +3,7 @@
 9mount, 9bind, 9umount \- mount/unmount 9p filesystems
 .SH SYNOPSIS
 .B 9mount
-[ -diuv ] [ -a SPEC ] DIAL MOUNTPT
+[ -dinuv ] [ -a SPEC ] DIAL MOUNTPT
 .PP
 .B 9bind
 OLD NEW
@@ -31,6 +31,9 @@ generate debugging output (can be specified multiple times)
 -i
 mount the file system with your uid/gid
 .TP
+-n
+dry-run, print mount command but don't actually mount anything
+.TP 
 -u
 use the 9P2000.u extensions
 .TP
