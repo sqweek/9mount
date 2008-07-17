@@ -120,18 +120,6 @@ main(int argc, char **argv)
 		errx(1, "usage: 9mount [ -diuv ] [ -a spec ] dial mountpt");
 	}
 
-	if (aname && strchr(aname, ',')) {
-		errx(1, "%s: spec can't contain commas", aname);
-	}
-
-	if (cache) {
-		if (strcmp(cache, "loose" != 0)) {
-			errx(1, "%s: unknown cache mode (expecting loose)", cache);
-		}
-		snprintf(buf, sizeof(buf), "cache=%s", cache);
-		append(&opts, buf, &optlen);
-	}
-
 	/* Make sure mount exists, is writable, and not sticky */
 	if (stat(mountpt, &stbuf) || access(mountpt, W_OK)) {
 		err(1, "%s", mountpt);
@@ -146,6 +134,22 @@ main(int argc, char **argv)
 	append(&opts, proto, &optlen); /* < 2.6.24 */
 	snprintf(buf, sizeof(buf), "trans=%s", proto);
 	append(&opts, buf, &optlen); /* >= 2.6.24 */
+
+	if (aname) {
+		if (strchr(aname, ',')) {
+			errx(1, "%s: spec can't contain commas", aname);
+		}
+		snprintf(buf, sizeof(buf), "aname=%s", aname);
+		append(&opts, buf, &optlen);
+	}
+
+	if (cache) {
+		if (strcmp(cache, "loose" != 0)) {
+			errx(1, "%s: unknown cache mode (expecting loose)", cache);
+		}
+		snprintf(buf, sizeof(buf), "cache=%s", cache);
+		append(&opts, buf, &optlen);
+	}
 
 	if (getenv("USER")) {
 		snprintf(buf, sizeof(buf), "uname=%s", getenv(USER));
@@ -173,10 +177,6 @@ main(int argc, char **argv)
 	}
 	if (debug) {
 		snprintf(buf, sizeof(buf), "debug=%d", debug);
-		append(&opts, buf, &optlen);
-	}
-	if (aname) {
-		snprintf(buf, sizeof(buf), "aname=%s", aname);
 		append(&opts, buf, &optlen);
 	}
 	if (port) {
