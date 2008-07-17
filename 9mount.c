@@ -135,8 +135,16 @@ main(int argc, char **argv)
 	snprintf(buf, sizeof(buf), "trans=%s", proto);
 	append(&opts, buf, &optlen); /* >= 2.6.24 */
 
-	pw = getpwuid(getuid());
-	snprintf(buf, sizeof(buf), "uname=%s", pw->pw_name);
+	if (getenv("USER")) {
+		snprintf(buf, sizeof(buf), "uname=%s", getenv(USER));
+	} else if ((pw=getpwuid(getuid()))) {
+		snprintf(buf, sizeof(buf), "uname=%s", pw->pw_name);
+	} else {
+		err(1, "getpwuid");
+	}
+	if (strchr(buf, ',')) {
+		errx(1, "%s: username cannot contain commas", buf+6);
+	}
 	append(&opts, buf, &optlen);
 
 	if (!dotu) {
