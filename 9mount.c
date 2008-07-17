@@ -79,7 +79,7 @@ main(int argc, char **argv)
 	struct stat stbuf;
 	struct passwd *pw;
 	int dotu = 0, uidgid = 0, dev = 0, debug = 0, dryrun = 0;
-	char *aname = NULL, *proto, *addr;
+	char *cache = NULL, *aname = NULL, *proto, *addr;
 	/* FILE *fp;
 	struct mntent m; */
 
@@ -101,6 +101,10 @@ main(int argc, char **argv)
 						aname = getarg('a', cp, &argv);
 						*cp-- = '\0'; /* breaks out of for loop */
 						break;
+					case 'c':
+						cache = getarg('c', cp, &argv);
+						*cp-- = '\0';
+						break;
 				}
 			}
 		} else if (!dial) {
@@ -117,7 +121,15 @@ main(int argc, char **argv)
 	}
 
 	if (aname && strchr(aname, ',')) {
-		errx(1, "spec can't contain commas");
+		errx(1, "%s: spec can't contain commas", aname);
+	}
+
+	if (cache) {
+		if (strcmp(cache, "loose" != 0)) {
+			errx(1, "%s: unknown cache mode (expecting loose)", cache);
+		}
+		snprintf(buf, sizeof(buf), "cache=%s", cache);
+		append(&opts, buf, &optlen);
 	}
 
 	/* Make sure mount exists, is writable, and not sticky */
@@ -143,7 +155,7 @@ main(int argc, char **argv)
 		err(1, "getpwuid");
 	}
 	if (strchr(buf, ',')) {
-		errx(1, "%s: username cannot contain commas", buf+6);
+		errx(1, "%s: username can't contain commas", buf+6);
 	}
 	append(&opts, buf, &optlen);
 
