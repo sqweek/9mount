@@ -3,7 +3,7 @@
 9mount, 9bind, 9umount \- mount/unmount 9p filesystems
 .SH SYNOPSIS
 .B 9mount
-[ -dinuv ] [ -a SPEC ] DIAL MOUNTPT
+[ -dinuv ] [ -a SPEC ] [ -c CACHE ] DIAL MOUNTPT
 .PP
 .B 9bind
 OLD NEW
@@ -43,6 +43,11 @@ use device mapping
 -a SPEC
 SPEC determines which file tree to mount when attaching to file servers that
 export multiple trees
+.TP
+-c CACHE
+turns on caching using CACHE mode. Currently only
+.I loose
+cache mode is available, which is suitable for exclusive read-only mounts.
 .PP
 .B 9bind
 performs a bind mount, making the tree visible at directory OLD also visible
