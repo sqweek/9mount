@@ -94,7 +94,7 @@ main(int argc, char **argv)
 	int optlen = 64, port = 0, i;
 	struct stat stbuf;
 	struct passwd *pw;
-	int dotu = 0, uidgid = 0, dev = 0, debug = 0, dryrun = 0;
+	int axess = 0, dotu = 0, uidgid = 0, dev = 0, debug = 0, dryrun = 0;
 	char *debugstr = NULL, *msize = NULL, *cache = NULL, *aname = NULL;
 	char *cp, *proto, *addr;
 	/* FILE *fp;
@@ -111,8 +111,10 @@ main(int argc, char **argv)
 				switch (*cp) {
 					case 'i': uidgid = 1; break;
 					case 'n': dryrun = 1; break;
+					case 's': axess = -1; break;
 					case 'u': dotu = 1; break;
 					case 'v': dev = 1; break;
+					case 'x': axess = getuid(); break;
 					case 'a':
 						aname = getarg('a', cp, &argv);
 						*cp-- = '\0'; /* breaks out of for loop */
@@ -141,7 +143,7 @@ main(int argc, char **argv)
 	}
 
 	if (!dial || !mountpt) {
-		errx(1, "usage: 9mount [ -inuv ] [ -a spec ] [ -c cache ] [ -d debug ] [ -m msize ] dial mountpt");
+		errx(1, "usage: 9mount [ -insuvx ] [ -a spec ] [ -c cache ] [ -d debug ] [ -m msize ] dial mountpt");
 	}
 
 	/* Make sure mount exists, is writable, and not sticky */
@@ -217,6 +219,12 @@ main(int argc, char **argv)
 	}
 	append(&opts, buf, &optlen);
 
+	if (axess == -1) {
+		append(&opts, "access=any", &optlen);
+	} else if (axess) {
+		snprintf(buf, sizeof(buf), "access=%d", axess);
+		append(&opts, buf, &optlen);
+	}
 	if (!dotu) {
 		append(&opts, "noextend", &optlen);
 	}

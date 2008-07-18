@@ -3,7 +3,7 @@
 9mount, 9bind, 9umount \- mount/unmount 9p filesystems
 .SH SYNOPSIS
 .B 9mount
-[ inuv ] [ -a SPEC ] [ -c CACHE ] [ -d DEBUG ] [ -m MSIZE ] DIAL MOUNTPT
+[ insuvx ] [ -a SPEC ] [ -c CACHE ] [ -d DEBUG ] [ -m MSIZE ] DIAL MOUNTPT
 .PP
 .B 9bind
 OLD NEW
@@ -36,12 +36,19 @@ mount the file system with your uid/gid
 .TP
 -n
 dry-run, print mount command to stderr but don't actually mount anything
-.TP 
+.TP
+-s
+single attach mode - all users accessing the mount point see the same
+filesystem (default is one attach per user)
+.TP
 -u
 use the 9P2000.u extensions
 .TP
 -v
 use device mapping
+.TP
+-x
+exclusive access - other users cannot access the mount point
 .TP
 -a SPEC
 SPEC determines which file tree to mount when attaching to file servers that
