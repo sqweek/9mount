@@ -79,7 +79,7 @@ main(int argc, char **argv)
 	struct stat stbuf;
 	struct passwd *pw;
 	int dotu = 0, uidgid = 0, dev = 0, debug = 0, dryrun = 0;
-	char *cache = NULL, *aname = NULL, *proto, *addr;
+	char *msize = NULL, *cache = NULL, *aname = NULL, *proto, *addr;
 	/* FILE *fp;
 	struct mntent m; */
 
@@ -105,6 +105,10 @@ main(int argc, char **argv)
 						cache = getarg('c', cp, &argv);
 						*cp-- = '\0';
 						break;
+					case 'm':
+						msize = getarg('m', cp, &argv);
+						*cp-- = '\0';
+						break;
 				}
 			}
 		} else if (!dial) {
@@ -117,7 +121,7 @@ main(int argc, char **argv)
 	}
 
 	if (!dial || !mountpt) {
-		errx(1, "usage: 9mount [ -diuv ] [ -a spec ] dial mountpt");
+		errx(1, "usage: 9mount [ -diuv ] [ -a spec ] [ -m msize ] dial mountpt");
 	}
 
 	/* Make sure mount exists, is writable, and not sticky */
@@ -148,6 +152,14 @@ main(int argc, char **argv)
 			errx(1, "%s: unknown cache mode (expecting loose)", cache);
 		}
 		snprintf(buf, sizeof(buf), "cache=%s", cache);
+		append(&opts, buf, &optlen);
+	}
+
+	if (msize) {
+		if (strspn(msize, "0123456789") < strlen(msize)) {
+			errx(1, "%s: msize must be an integer", msize);
+		}
+		snprintf(buf, sizeof(buf), "msize=%s", msize);
 		append(&opts, buf, &optlen);
 	}
 
