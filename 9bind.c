@@ -1,3 +1,6 @@
+/* © 2008 sqweek <sqweek@gmail.com>
+ * See COPYING for details.
+ */
 #include <err.h>
 #include <stdlib.h>
 #include <stdio.h>
