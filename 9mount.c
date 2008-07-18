@@ -46,8 +46,10 @@ parsedial(char *dial, char **network, char **netaddr, int *port)
 	if (!(*network=strtok(dial, "!"))) {
 		errx(1, "empty dial string");
 	}
-	if (strcmp(*network, "unix") != 0 && strcmp(*network, "tcp") != 0) {
-		errx(1, "%s: unknown network (expecting unix or tcp)", *network);
+	if (strcmp(*network, "unix") != 0
+	&& strcmp(*network, "tcp") != 0
+	&& strcmp(*network, "virtio") != 0) {
+		errx(1, "%s: unknown network (expecting unix, tcp or virtio)", *network);
 	}
 	if (!(*netaddr=strtok(NULL, "!"))) {
 		errx(1, "missing dial netaddress");
@@ -206,7 +208,7 @@ main(int argc, char **argv)
 						sizeof(buf), NULL, 0, NI_NUMERICHOST))) {
 			errx(1, "getnameinfo: %s", gai_strerror(r));
 		}
-	} else { /* unix socket */
+	} else { /* unix socket or virtio device */
 		snprintf(buf, sizeof(buf), "%s", addr);
 	}
 
