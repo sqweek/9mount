@@ -121,7 +121,7 @@ main(int argc, char **argv)
 	}
 
 	if (!dial || !mountpt) {
-		errx(1, "usage: 9mount [ -diuv ] [ -a spec ] [ -m msize ] dial mountpt");
+		errx(1, "usage: 9mount [ -dinuv ] [ -a spec ] [ -c cache ] [ -m msize ] dial mountpt");
 	}
 
 	/* Make sure mount exists, is writable, and not sticky */
@@ -148,7 +148,7 @@ main(int argc, char **argv)
 	}
 
 	if (cache) {
-		if (strcmp(cache, "loose" != 0)) {
+		if (strcmp(cache, "loose") != 0) {
 			errx(1, "%s: unknown cache mode (expecting loose)", cache);
 		}
 		snprintf(buf, sizeof(buf), "cache=%s", cache);
@@ -164,7 +164,7 @@ main(int argc, char **argv)
 	}
 
 	if (getenv("USER")) {
-		snprintf(buf, sizeof(buf), "uname=%s", getenv(USER));
+		snprintf(buf, sizeof(buf), "uname=%s", getenv("USER"));
 	} else if ((pw=getpwuid(getuid()))) {
 		snprintf(buf, sizeof(buf), "uname=%s", pw->pw_name);
 	} else {
