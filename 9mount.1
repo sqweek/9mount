@@ -21,10 +21,13 @@ unix!SOCKET
 tcp!HOST[!PORT]
 .br
 virtio!CHANNEL
+.br
+-
 .PP
 where SOCKET is the name of a file representing a socket, HOST is a
 hostname, PORT is a port number or service name, and CHANNEL is a
-virtio channel name (currently ignored).
+virtio channel name (currently ignored). - indicates that 9p messages
+should be read/written on stdin/stdout.
 .B 9mount
 has several options:
 .TP

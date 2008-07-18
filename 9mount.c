@@ -134,7 +134,13 @@ main(int argc, char **argv)
 		errx(1, "%s: refusing to mount over sticky directory", mountpt);
 	}
 
-	parsedial(dial, &proto, &addr, &port);
+	if (strcmp(dial, "-") == 0) {
+		proto = "fd";
+		addr = "nodev";
+		append(&opts, "rfdno=0,wrfdno=1", &optlen);
+	} else {
+		parsedial(dial, &proto, &addr, &port);
+	}
 
 	/* set up mount options */
 	append(&opts, proto, &optlen); /* < 2.6.24 */
@@ -208,12 +214,12 @@ main(int argc, char **argv)
 						sizeof(buf), NULL, 0, NI_NUMERICHOST))) {
 			errx(1, "getnameinfo: %s", gai_strerror(r));
 		}
-	} else { /* unix socket or virtio device */
+	} else { /* unix socket, virtio device or fd transport */
 		snprintf(buf, sizeof(buf), "%s", addr);
 	}
 
 	if(dryrun) {
-		printf("mount -t 9p -o %s %s %s\n", opts, buf, mountpt);
+		fprintf(stderr, "mount -t 9p -o %s %s %s\n", opts, buf, mountpt);
 	} else if (mount(buf, mountpt, "9p", 0, (void*)opts)) {
 		err(1, "mount");
 	}
