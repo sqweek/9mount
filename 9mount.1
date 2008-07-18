@@ -3,7 +3,7 @@
 9mount, 9bind, 9umount \- mount/unmount 9p filesystems
 .SH SYNOPSIS
 .B 9mount
-[ -dinuv ] [ -a SPEC ] [ -c CACHE ] [ -m MSIZE ] DIAL MOUNTPT
+[ inuv ] [ -a SPEC ] [ -c CACHE ] [ -d DEBUG ] [ -m MSIZE ] DIAL MOUNTPT
 .PP
 .B 9bind
 OLD NEW
@@ -31,14 +31,11 @@ should be read/written on stdin/stdout.
 .B 9mount
 has several options:
 .TP
--d
-generate debugging output (can be specified multiple times)
-.TP
 -i
 mount the file system with your uid/gid
 .TP
 -n
-dry-run, print mount command but don't actually mount anything
+dry-run, print mount command to stderr but don't actually mount anything
 .TP 
 -u
 use the 9P2000.u extensions
@@ -54,6 +51,10 @@ export multiple trees
 turns on caching using CACHE mode. Currently only
 .I loose
 cache mode is available, which is suitable for exclusive read-only mounts.
+.TP
+-d DEBUG
+comma seperated list of channels for which to enable debug output. Possible
+channels include: err, devel, 9p, vfs, conv, mux, trans, alloc, fcall.
 .TP
 -m MSIZE
 specifies the maximum length of a single 9p message in bytes.

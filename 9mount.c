@@ -13,6 +13,20 @@
 #include <pwd.h>
 #include <netdb.h>
 
+#define nelem(x) (sizeof(x)/sizeof(*(x)))
+
+struct {char *mnemonic; int mask;} debug_flags[] = {
+	{"err", 0x001},
+	{"devel", 0x002},
+	{"9p", 0x004},
+	{"vfs", 0x008},
+	{"conv", 0x010},
+	{"mux", 0x020},
+	{"trans", 0x040},
+	{"alloc", 0x080},
+	{"fcall", 0x100}
+};
+
 char*
 append(char **dest, char *src, int *destlen)
 {
@@ -77,11 +91,12 @@ int
 main(int argc, char **argv)
 {
 	char buf[256], *opts, *dial = NULL, *mountpt = NULL;
-	int optlen = 64, port = 0;
+	int optlen = 64, port = 0, i;
 	struct stat stbuf;
 	struct passwd *pw;
 	int dotu = 0, uidgid = 0, dev = 0, debug = 0, dryrun = 0;
-	char *msize = NULL, *cache = NULL, *aname = NULL, *proto, *addr;
+	char *debugstr = NULL, *msize = NULL, *cache = NULL, *aname = NULL;
+	char *cp, *proto, *addr;
 	/* FILE *fp;
 	struct mntent m; */
 
@@ -94,7 +109,6 @@ main(int argc, char **argv)
 		if (**argv == '-') {
 			for (cp=*argv+1; *cp; ++cp) {
 				switch (*cp) {
-					case 'd': ++debug; break;
 					case 'i': uidgid = 1; break;
 					case 'n': dryrun = 1; break;
 					case 'u': dotu = 1; break;
@@ -105,6 +119,10 @@ main(int argc, char **argv)
 						break;
 					case 'c':
 						cache = getarg('c', cp, &argv);
+						*cp-- = '\0';
+						break;
+					case 'd':
+						debugstr = getarg('d', cp, &argv);
 						*cp-- = '\0';
 						break;
 					case 'm':
@@ -123,7 +141,7 @@ main(int argc, char **argv)
 	}
 
 	if (!dial || !mountpt) {
-		errx(1, "usage: 9mount [ -dinuv ] [ -a spec ] [ -c cache ] [ -m msize ] dial mountpt");
+		errx(1, "usage: 9mount [ -inuv ] [ -a spec ] [ -c cache ] [ -d debug ] [ -m msize ] dial mountpt");
 	}
 
 	/* Make sure mount exists, is writable, and not sticky */
@@ -163,6 +181,22 @@ main(int argc, char **argv)
 		append(&opts, buf, &optlen);
 	}
 
+	if (debugstr) {
+		for (cp=strtok(debugstr, ","); cp; cp=strtok(NULL, ",")) {
+			for (i=0; i<nelem(debug_flags); ++i) {
+				if (strcmp(cp, debug_flags[i].mnemonic)) {
+					debug |= debug_flags[i].mask;
+					break;
+				}
+			}
+			if (i >= nelem(debug_flags)) {
+				errx(1, "%s: unrecognised debug channel", cp);
+			}
+		}
+		snprintf(buf, sizeof(buf), "debug=%d", debug);
+		append(&opts, buf, &optlen);
+	}
+
 	if (msize) {
 		if (strspn(msize, "0123456789") < strlen(msize)) {
 			errx(1, "%s: msize must be an integer", msize);
@@ -194,10 +228,6 @@ main(int argc, char **argv)
 		append(&opts, buf, &optlen); /* < 2.6.24 */
 		snprintf(buf, sizeof(buf), "dfltuid=%d,dfltgid=%d", getuid(), getgid());
 		append(&opts, buf, &optlen); /* >= 2.6.24 */
-	}
-	if (debug) {
-		snprintf(buf, sizeof(buf), "debug=%d", debug);
-		append(&opts, buf, &optlen);
 	}
 	if (port) {
 		snprintf(buf, sizeof(buf), "port=%d", port);
