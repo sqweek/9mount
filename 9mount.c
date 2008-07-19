@@ -60,6 +60,7 @@ getarg(char opt, char *cp, char*** argv)
 void
 parsedial(char *dial, char **network, char **netaddr, int *port)
 {
+	char *cp;
 	if (!(*network=strtok(dial, "!"))) {
 		errx(1, "empty dial string");
 	}
@@ -87,6 +88,9 @@ parsedial(char *dial, char **network, char **netaddr, int *port)
 				}
 			}
 		}
+	}
+	if ((cp=strtok(NULL, "!"))) {
+		errx(1, "%s: junk trailing dial string", cp);
 	}
 }
 
