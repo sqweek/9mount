@@ -189,7 +189,7 @@ main(int argc, char **argv)
 	if (debugstr) {
 		for (cp=strtok(debugstr, ","); cp; cp=strtok(NULL, ",")) {
 			for (i=0; i<nelem(debug_flags); ++i) {
-				if (strcmp(cp, debug_flags[i].mnemonic)) {
+				if (strcmp(cp, debug_flags[i].mnemonic) == 0) {
 					debug |= debug_flags[i].mask;
 					break;
 				}
@@ -198,7 +198,7 @@ main(int argc, char **argv)
 				errx(1, "%s: unrecognised debug channel", cp);
 			}
 		}
-		snprintf(buf, sizeof(buf), "debug=%d", debug);
+		snprintf(buf, sizeof(buf), "debug=0x%04x", debug);
 		append(&opts, buf, &optlen);
 	}
 
