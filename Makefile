@@ -23,6 +23,6 @@ install: all
 	cp -f 9umount $(bindir)
 	cp -f 9bind $(bindir)
 	chown root:users $(bindir)/9mount $(bindir)/9umount $(bindir)/9bind
-	chmod 4750 $(bindir)/9mount $(bindir)/9umount $(bindir)/9bind
+	chmod 4755 $(bindir)/9mount $(bindir)/9umount $(bindir)/9bind
 	mkdir -p $(mandir)/man1
 	cp -f 9mount.1 $(mandir)/man1
