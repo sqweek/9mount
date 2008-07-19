@@ -36,7 +36,7 @@ append(char **dest, char *src, int *destlen)
 	while (strlen(*dest) + 1 + strlen(src) > *destlen)
 		*destlen *= 2;
 	if (!(*dest=realloc(*dest, *destlen)))
-		errx(1, "Out of memory");
+		errx(1, "out of memory");
 
 	if (**dest)
 		strcat(*dest, ",");
@@ -104,8 +104,6 @@ main(int argc, char **argv)
 	int axess = 0, dotu = 0, uidgid = 0, dev = 0, debug = 0, dryrun = 0;
 	char *debugstr = NULL, *msize = NULL, *cache = NULL, *aname = NULL;
 	char *cp, *proto, *addr;
-	/* FILE *fp;
-	struct mntent m; */
 
 	if (!(opts=calloc(optlen, 1))) {
 		err(1, "calloc");
@@ -266,17 +264,6 @@ main(int argc, char **argv)
 	} else if (mount(buf, mountpt, "9p", 0, (void*)opts)) {
 		err(1, "mount");
 	}
-
-	/*
-	m.mnt_fsname = buf;
-	m.mnt_dir = mountpt;
-	m.mnt_type = "9p";
-	m.mnt_opts = opts;
-	m.mnt_freq = 0;
-	m.mnt_passno = 0;
-	if (!(fp=fopen("/etc/mtab", "a")) || addmntent(fp, &m)) {
-		warn("mount succeeded but couldn't add entry to /etc/mtab");
-	}*/
 
 	return 0;
 }

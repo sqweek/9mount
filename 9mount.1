@@ -96,6 +96,9 @@ truncates user names and SPECs to 249 characters.
 doesn't know this, so you won't be able to unmount anything. But you
 probably never bother logging out if your user name is that long.
 .PP
+.B 9mount
+doesn't update /etc/mtab.
+.PP
 .B 9bind
 only does a "shallow", non-recursive bind - any mounted filesystems
 under the OLD tree will not appear mounted in the NEW tree.
