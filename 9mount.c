@@ -107,9 +107,7 @@ main(int argc, char **argv)
 		err(1, "calloc");
 	}
 	while (*++argv) {
-		char *cp;
-
-		if (**argv == '-') {
+		if (**argv == '-' && (*argv)[1] != '\0') {
 			for (cp=*argv+1; *cp; ++cp) {
 				switch (*cp) {
 					case 'i': uidgid = 1; break;

@@ -39,7 +39,7 @@ dry-run, print mount command to stderr but don't actually mount anything
 .TP
 -s
 single attach mode - all users accessing the mount point see the same
-filesystem (default is one attach per user)
+filesystem (by default they'll each see a unique attach)
 .TP
 -u
 use the 9P2000.u extensions
@@ -72,6 +72,10 @@ at mount point NEW.
 .PP
 .B 9umount
 unmounts a 9p filesystem previously mounted by you.
+.SH ENVIRONMENT
+.TP
+$USER
+the uname to provide to the server.
 .SH EXAMPLES
 .TP
 9mount -i 'unix!/tmp/ns.'$USER'.:0/factotum' $HOME/n/factotum
