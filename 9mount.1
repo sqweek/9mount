@@ -93,8 +93,9 @@ again importing my maildir, this time serving via u9fs
 .B 9mount
 truncates user names and SPECs to 249 characters.
 .B 9umount
-doesn't know this, so you won't be able to unmount anything. But you
-probably never bother logging out if your user name is that long.
+doesn't know this, so you won't be able to unmount anything
+outside your home directory. But you probably never bother
+logging out if your user name is that long.
 .PP
 .B 9mount
 doesn't update /etc/mtab.
@@ -105,7 +106,7 @@ under the OLD tree will not appear mounted in the NEW tree.
 .PP
 If you
 .B 9bind
-a non-9p filesystem,
+a non-9p filesystem outside your home directory,
 .B 9umount
 won't let you unmount it.
 .SH AUTHOR

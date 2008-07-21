@@ -68,18 +68,21 @@ canonpath(char *rel)
 }
 
 int
-mountedby(struct mntent *mnt, struct passwd *pw)
+indir(struct mntent *mnt, char *dir)
+{
+	return (strncmp(mnt->mnt_dir, dir, strlen(dir)) == 0);
+}
+
+int
+mountedby(struct mntent *mnt, char *username)
 {
 	char *s, *cp;
-	if (strncmp(mnt->mnt_dir, pw->pw_dir, strlen(pw->pw_dir)) == 0) {
-		return 1; /* mount point in user's home directory */
-	}
 	if (!(s=strdup(mnt->mnt_opts))) {
 		errx(1, "out of memory");
 	}
 	for (cp=strtok(s, ","); cp; cp=strtok(NULL, ",")) {
 		if (strncmp(cp, "name=", 5) == 0) {
-			int eq = (strcmp(cp+5, pw->pw_name) == 0);
+			int eq = (strcmp(cp+5, username) == 0);
 			free(s);
 			return eq;
 		}
@@ -97,7 +100,9 @@ main(int argc, char **argv)
 	struct mntent *mnt;
 	struct passwd *pw;
 
-	pw = getpwuid(getuid());
+	if (!(pw=getpwuid(getuid()))) {
+		err(1, "who are you?? getpwuid failed");
+	}
 
 	while (*++argv) {
 		if (!(path=canonpath(*argv))) {
@@ -109,10 +114,12 @@ main(int argc, char **argv)
 		}
 		while ((mnt=getmntent(fp))) {
 			if (strcmp(path, mnt->mnt_dir) == 0) {
-				if (strcmp(mnt->mnt_type, "9p")) {
+				int inhomedir;
+				inhomedir = indir(mnt, pw->pw_dir);
+				if (!inhomedir && strcmp(mnt->mnt_type, "9p") != 0) {
 					warnx("%s: refusing to unmount non-9p fs", path);
 					ret = 1;
-				} else if (!mountedby(mnt, pw)) {
+				} else if (!inhomedir && !mountedby(mnt, pw->pw_name)) {
 					warnx("%s: not mounted by you", path);
 					ret = 1;
 				} else if (umount(mnt->mnt_dir)) {
