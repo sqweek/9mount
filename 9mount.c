@@ -149,6 +149,9 @@ main(int argc, char **argv)
 		errx(1, "usage: 9mount [ -insuvx ] [ -a spec ] [ -c cache ] [ -d debug ] [ -m msize ] dial mountpt");
 	}
 
+	if(!(pw=getpwuid(getuid()))) {
+		err(1, "who are you?? getpwuid failed");
+	}
 	/* Make sure mount exists, is writable, and not sticky */
 	if (stat(mountpt, &stbuf) || access(mountpt, W_OK)) {
 		err(1, "%s", mountpt);
@@ -210,12 +213,13 @@ main(int argc, char **argv)
 		append(&opts, buf, &optlen);
 	}
 
+	snprintf(buf, sizeof(buf), "name=%s", pw->pw_name);
+	append(&opts, buf, &optlen);
+
 	if (getenv("USER")) {
 		snprintf(buf, sizeof(buf), "uname=%s", getenv("USER"));
-	} else if ((pw=getpwuid(getuid()))) {
-		snprintf(buf, sizeof(buf), "uname=%s", pw->pw_name);
 	} else {
-		err(1, "getpwuid");
+		snprintf(buf, sizeof(buf), "uname=%s", pw->pw_name);
 	}
 	if (strchr(buf, ',')) {
 		errx(1, "%s: username can't contain commas", buf+6);
