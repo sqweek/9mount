@@ -1,3 +1,11 @@
+2008-07-22 sqweek <sqweek@gmail.com>
+	* 1.3 release
+	* 9mount: support for custom uname, cache, msize, virtio, fd transport,
+	access modes, -d more useful
+	* 9umount: allow unmounting of even non-9p filesystems in your home dir
+	* introduced some test cases
+	* added ISC license
+
 2008-06-20 sqweek <sqweek@gmail.com>
 	* 1.2 release
 	* 9mount: support for linux kernels >= 2.6.24
