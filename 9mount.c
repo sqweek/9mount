@@ -134,6 +134,8 @@ main(int argc, char **argv)
 						msize = getarg('m', cp, &argv);
 						*cp-- = '\0';
 						break;
+					default:
+						errx(1, "unrecognised argument '%c'", *cp);
 				}
 			}
 		} else if (!dial) {
