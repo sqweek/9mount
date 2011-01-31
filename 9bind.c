@@ -8,12 +8,14 @@
 
 #include <sys/stat.h>
 #include <sys/mount.h>
+#include <sys/wait.h>
 
 int
 main(int argc, char **argv)
 {
 	char *old = NULL, *new = NULL;
 	struct stat stbuf;
+	int pid, status;
 
 	while (*++argv) {
 		if (!old) {
@@ -37,9 +39,16 @@ main(int argc, char **argv)
 		errx(1, "%s: refusing to bind over sticky directory", new);
 	}
 
-	if (mount(old, new, NULL, MS_BIND, NULL)) {
-		err(1, "mount");
+	switch(pid=fork()) {
+		case -1:
+			err(1, "fork");
+		case 0:
+			setuid(0);
+			execl("/bin/mount", "mount", "--bind", old, new, (char*)NULL);
+			err(1, "execl");
+		default:
+			wait(&status);
 	}
 
-	return 0;
+	return WEXITSTATUS(status);
 }

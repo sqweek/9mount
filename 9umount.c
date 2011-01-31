@@ -9,6 +9,7 @@
 
 #include <sys/types.h>
 #include <sys/mount.h>
+#include <sys/wait.h>
 #include <mntent.h>
 #include <pwd.h>
 
@@ -122,9 +123,22 @@ main(int argc, char **argv)
 				} else if (!inhomedir && !mountedby(mnt, pw->pw_name)) {
 					warnx("%s: not mounted by you", path);
 					ret = 1;
-				} else if (umount(mnt->mnt_dir)) {
-					warn("umount %s", mnt->mnt_dir);
-					ret = 1;
+				} else {
+					int pid, status;
+					switch(pid=fork()) {
+						case -1:
+							warn("%s: fork", path);
+						case 0:
+							setuid(0);
+							execl("/bin/umount", "umount", mnt->mnt_dir, (char*)NULL);
+							warn("%s: execl", path);
+						default:
+							wait(&status);
+							if(WEXITSTATUS(status) != 0) {
+								warn("%s: couldn't unmount", path);
+								ret = 1;
+							}
+					}
 				}
 				goto done;
 			}
