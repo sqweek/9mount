@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <sys/mount.h>
+#include <sys/wait.h>
 #include <arpa/inet.h>
 #include <pwd.h>
 #include <netdb.h>
@@ -267,8 +268,19 @@ main(int argc, char **argv)
 
 	if(dryrun) {
 		fprintf(stderr, "mount -t 9p -o %s %s %s\n", opts, buf, mountpt);
-	} else if (mount(buf, mountpt, "9p", 0, (void*)opts)) {
-		err(1, "mount");
+	} else {
+		int pid, status;
+		switch(pid=fork()) {
+			case -1:
+				err(1, "fork");
+			case 0:
+				setuid(0);
+				execl("/bin/mount", "mount", "-t", "9p", "-o", opts, buf, mountpt, (char*)NULL);
+				err(1, "execl");
+			default:
+				wait(&status);
+				return WEXITSTATUS(status);
+		}
 	}
 
 	return 0;
