@@ -253,8 +253,12 @@ main(int argc, char **argv)
 
 	if (strcmp(proto, "tcp") == 0) {
 		struct addrinfo *ai;
+		struct addrinfo aihints;
 		int r;
-		if ((r=getaddrinfo(addr, NULL, NULL, &ai))) {
+		memset(&aihints, 0, sizeof(aihints));
+		aihints.ai_family = AF_INET;
+		aihints.ai_socktype = SOCK_STREAM;
+		if ((r=getaddrinfo(addr, NULL, &aihints, &ai))) {
 			errx(1, "getaddrinfo: %s", gai_strerror(r));
 		}
 		if ((r=getnameinfo(ai->ai_addr, ai->ai_addrlen, buf,
