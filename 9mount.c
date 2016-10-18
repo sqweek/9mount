@@ -165,7 +165,7 @@ main(int argc, char **argv)
 	if (strcmp(dial, "-") == 0) {
 		proto = "fd";
 		addr = "nodev";
-		append(&opts, "rfdno=0,wrfdno=1", &optlen);
+		append(&opts, "rfdno=0,wfdno=1", &optlen);
 	} else {
 		parsedial(dial, &proto, &addr, &port);
 	}
