@@ -97,6 +97,11 @@ parsedial(char *dial, char **network, char **netaddr, int *port)
 	if ((cp=strtok(NULL, "!"))) {
 		errx(1, "%s: junk trailing dial string", cp);
 	}
+	if (strcmp(*network, "unix") == 0) {
+		if (access(*netaddr, R_OK | W_OK)) {
+			err(1, "%s", *netaddr);
+		}
+	}
 }
 
 int
