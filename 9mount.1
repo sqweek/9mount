@@ -55,9 +55,12 @@ SPEC determines which file tree to mount when attaching to file servers that
 export multiple trees
 .TP
 -c CACHE
-turns on caching using CACHE mode. Currently only
+turns on caching using CACHE mode. Supported modes are
 .I loose
-cache mode is available, which is suitable for exclusive read-only mounts.
+(suitable for exclusive read-only mounts), 
+.IR fscache ,
+and
+.IR mmap .
 .TP
 -d DEBUG
 comma seperated list of channels for which to enable debug output. Possible

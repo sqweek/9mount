@@ -189,8 +189,10 @@ main(int argc, char **argv)
 	}
 
 	if (cache) {
-		if (strcmp(cache, "loose") != 0) {
-			errx(1, "%s: unknown cache mode (expecting loose)", cache);
+		if (strcmp(cache, "loose") != 0
+		&& strcmp(cache, "fscache") != 0
+		&& strcmp(cache, "mmap") != 0) {
+			errx(1, "%s: unknown cache mode (expecting loose, fscache, or mmap)", cache);
 		}
 		snprintf(buf, sizeof(buf), "cache=%s", cache);
 		append(&opts, buf, &optlen);
