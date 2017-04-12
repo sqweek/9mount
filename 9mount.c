@@ -253,6 +253,9 @@ main(int argc, char **argv)
 	if (!dev) {
 		append(&opts, "nodev", &optlen);
 	}
+	if (pw->pw_uid != 0) {
+		append(&opts, "nosuid", &optlen);
+	}
 	if (uidgid) {
 		snprintf(buf, sizeof(buf), "uid=%d,gid=%d", getuid(), getgid());
 		append(&opts, buf, &optlen); /* < 2.6.24 */
