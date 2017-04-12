@@ -64,7 +64,8 @@ comma seperated list of channels for which to enable debug output. Possible
 channels include: err, devel, 9p, vfs, conv, mux, trans, alloc, fcall.
 .TP
 -m MSIZE
-specifies the maximum length of a single 9p message in bytes.
+specifies the maximum length of a single 9p message in bytes. Must be less
+than or equal to 8192 for non-root users.
 .PP
 .B 9bind
 performs a bind mount, making the tree visible at directory OLD also visible
