@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -17,6 +18,10 @@
 #include <netdb.h>
 
 #define nelem(x) (sizeof(x)/sizeof(*(x)))
+
+enum {
+	Maxmsize = 8192,
+};
 
 struct {char *mnemonic; int mask;} debug_flags[] = {
 	{"err", 0x001},
@@ -208,10 +213,16 @@ main(int argc, char **argv)
 	}
 
 	if (msize) {
-		if (strspn(msize, "0123456789") < strlen(msize)) {
-			errx(1, "%s: msize must be an integer", msize);
+		unsigned long nmsize;
+		char *end = NULL;
+		nmsize = strtoul(msize, &end, 10);
+		if (*end || nmsize == 0 || nmsize > INT_MAX) {
+			errx(1, "%s: msize must be a positive integer", msize);
 		}
-		snprintf(buf, sizeof(buf), "msize=%s", msize);
+		if (pw->pw_uid != 0 && nmsize > Maxmsize) {
+			nmsize = Maxmsize;
+		}
+		snprintf(buf, sizeof(buf), "msize=%lu", nmsize);
 		append(&opts, buf, &optlen);
 	}
 
